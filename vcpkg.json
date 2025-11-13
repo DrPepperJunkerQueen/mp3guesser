@@ -1,0 +1,9 @@
+{
+  "name": "mp3-guesser",
+  "version": "1.0.0",
+  "dependencies": [
+    "wxwidgets",
+    "sfml",
+    "taglib"
+  ]
+}
