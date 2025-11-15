@@ -1,15 +1,20 @@
 #pragma once
 #include <wx/wx.h>
+#include "BackgroundFrame.h"
+#include "Profile.h"
 
 // Deklaracja klasy naszego okna
-class ProfileFrame : public wxFrame
+class ProfileFrame : public BackgroundFrame
 {
 private:
-    wxPanel* m_panel; // Bêdziemy przechowywaæ wskaŸnik do panelu
-    wxBitmap m_backgroundBitmap; // Tutaj za³adujemy nasz obrazek t³a
+    Profile m_selectedProfile;
 
-    // Deklaracja funkcji, która bêdzie rysowaæ t³o
-    void OnPaint(wxPaintEvent& event);
+    // Deklaracje funkcji obs³uguj¹cych klikniêcia
+    void OnCreateProfile(wxCommandEvent& event);
+    void OnSelectProfile(wxCommandEvent& event);
+
+    // Makro do ³¹czenia zdarzeñ
+    wxDECLARE_EVENT_TABLE();
 public:
     // Mamy tylko konstruktor
     ProfileFrame();

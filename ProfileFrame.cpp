@@ -1,80 +1,92 @@
 #include "ProfileFrame.h"
-#include "Definitions.h"
+#include "SelectProfileDialog.h"
+#include "GameFrame.h"
+#include "BackgroundFrame.h"
+#include <wx/textdlg.h>
+#include <wx/msgdlg.h>
+#include <iostream>
 
-ProfileFrame::ProfileFrame()
-    : wxFrame(NULL, wxID_ANY, "MP3 Guesser - Profile Selection")
+// ... (enum z ID przycisków - bez zmian) ...
+enum
 {
-    // --- KROK 1: Wczytaj obrazek t³a ---
-    // Obrazek "tlo.png" musi znajdowaæ siê w tym samym folderze co plik .exe
-    // (czyli np. w Twoim folderze x64/Debug)
-    wxImage::AddHandler(new wxPNGHandler); // Mówimy, ¿e bêdziemy ³adowaæ PNG
-    if (!m_backgroundBitmap.LoadFile(BACKGROUND_FILEPATH, wxBITMAP_TYPE_PNG))
-    {
-        // Jeœli siê nie uda, wypisz b³¹d (zobaczysz go w oknie "Output" w VS)
-        wxLogError("Can't load background file.");
-    }
+    ID_CreateProfileBtn = wxID_HIGHEST + 1,
+    ID_SelectProfileBtn
+};
 
+// Z Event Table ZNIKA EVT_PAINT
+wxBEGIN_EVENT_TABLE(ProfileFrame, BackgroundFrame) // <-- ZMIANA TUTAJ
+EVT_BUTTON(ID_CreateProfileBtn, ProfileFrame::OnCreateProfile)
+EVT_BUTTON(ID_SelectProfileBtn, ProfileFrame::OnSelectProfile)
+wxEND_EVENT_TABLE()
 
-    // --- KROK 2: Zmodyfikuj tworzenie panelu ---
+// Konstruktor jest teraz malutki
+ProfileFrame::ProfileFrame()
+    : BackgroundFrame(NULL, wxID_ANY, "MP3 Guesser - Profile Selection"), // <-- ZMIANA TUTAJ
+    m_selectedProfile(Profile()) // U¿yj konstruktora domyœlnego
+{
+    // ZNIKN¥£ CA£Y KOD T£A I PANELU!
+    // Ju¿ jest w BackgroundFrame.
+    // m_panel jest teraz chronion¹ zmienn¹ odziedziczon¹ z rodzica.
 
-    // U¿ywamy teraz zmiennej m_panel z pliku .h
-    m_panel = new wxPanel(this, wxID_ANY);
+    wxButton* createBtn = new wxButton(m_panel, ID_CreateProfileBtn, "Create Profile");
+    wxButton* selectBtn = new wxButton(m_panel, ID_SelectProfileBtn, "Select Profile");
 
-    // Mówimy panelowi, ¿e bêdziemy go malowaæ rêcznie
-    m_panel->SetBackgroundStyle(wxBG_STYLE_PAINT);
-
-
-    // --- KROK 3: Reszta kodu (przyciski i sizer) ---
-    // Wa¿ne: Zmieñ "panel->" na "m_panel->"
-
-    // --- Tworzenie przycisków ---
-    wxButton* createBtn = new wxButton(m_panel, wxID_ANY, "Create Profile");
-    wxButton* selectBtn = new wxButton(m_panel, wxID_ANY, "Select Profile");
-
-    // --- Ustawianie KONKRETNEGO rozmiaru ---
-    wxSize buttonSize = wxSize(250, 60); // Twój wybrany rozmiar
+    wxSize buttonSize = wxSize(250, 60);
     createBtn->SetMinSize(buttonSize);
     selectBtn->SetMinSize(buttonSize);
 
-    // --- Tworzenie sizera ---
     wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
-
-    // 1. Dodaj "pusty" rozci¹gliwy odstêp POWY¯EJ przycisków
-    //    Zajmie on ca³¹ woln¹ przestrzeñ na górze
     sizer->AddStretchSpacer(1);
-
-    // 2. Dodaj przyciski (z proporcj¹ 0 i centrowaniem w poziomie)
     sizer->Add(createBtn, 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 10);
     sizer->Add(selectBtn, 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 10);
-
-    // 3. Dodaj drugi "pusty" odstêp PONI¯EJ przycisków
-    //    Zajmie on ca³¹ woln¹ przestrzeñ na dole
     sizer->AddStretchSpacer(1);
 
-    // --- Ustawienie sizera dla panelu ---
     m_panel->SetSizer(sizer);
+    // Ustawienia rozmiaru i centrowania s¹ ju¿ w klasie bazowej\
 
-    this->SetClientSize(1280, 720);
-    this->Center();
-
-    // --- KROK 4: Podepnij zdarzenie rysowania ---
-    // Mówimy: "Gdy system bêdzie chcia³ narysowaæ m_panel,
-    // zamiast tego wywo³aj funkcjê ProfileFrame::OnPaint"
-    m_panel->Bind(wxEVT_PAINT, &ProfileFrame::OnPaint, this);
+    m_panel->Layout();
 }
 
-// --- KROK 5: Dodaj now¹ funkcjê OnPaint ---
+// ZNIKNÊ£A funkcja OnPaint! Jest w klasie bazowej.
 
-void ProfileFrame::OnPaint(wxPaintEvent& event)
+// ... (Funkcje OnCreateProfile i OnSelectProfile - bez zmian) ...
+// (Pamiêtaj, ¿eby dodaæ #include "SelectProfileDialog.h" i "GameFrame.h")
+void ProfileFrame::OnCreateProfile(wxCommandEvent& event)
 {
-    // SprawdŸ, czy bitmapa (obrazek) zosta³a poprawnie za³adowana
-    if (m_backgroundBitmap.IsOk())
+    wxTextEntryDialog dialog(this, "Enter your profile name:", "Create Profile");
+    if (dialog.ShowModal() == wxID_OK)
     {
-        // Stwórz "kontekst rysowania" dla naszego panelu
-        wxPaintDC dc(m_panel);
+        string name = dialog.GetValue().ToStdString();
+        if (name.empty())
+        {
+            wxMessageBox("Name cannot be empty!", "Error", wxOK | wxICON_ERROR);
+            return;
+        }
+        Profile newProfile(name);
+        newProfile.createProfile();
 
-        // Narysuj bitmapê (obrazek) w rogu panelu (0, 0)
-        dc.DrawBitmap(m_backgroundBitmap, 0, 0, false);
+        // PrzejdŸ od razu do gry
+        GameFrame* game = new GameFrame(newProfile);
+        game->Show();
+        this->Close();
     }
-    // Wa¿ne: Nie wywo³uj event.Skip() - chcemy w pe³ni przej¹æ kontrolê nad rysowaniem
+}
+
+void ProfileFrame::OnSelectProfile(wxCommandEvent& event)
+{
+    SelectProfileDialog dialog(this);
+    if (dialog.ShowModal() == wxID_OK)
+    {
+        Profile chosenProfile = dialog.getSelectedProfile();
+        if (chosenProfile.getID() != -1)
+        {
+            GameFrame* game = new GameFrame(chosenProfile);
+            game->Show();
+            this->Close();
+        }
+        else
+        {
+            wxMessageBox("No profile selected.", "Info", wxOK | wxICON_INFORMATION);
+        }
+    }
 }

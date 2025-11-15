@@ -135,17 +135,23 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
+    <ClCompile Include="BackgroundFrame.cpp" />
+    <ClCompile Include="GameFrame.cpp" />
     <ClCompile Include="Profile.cpp" />
     <ClCompile Include="ProfileFrame.cpp" />
+    <ClCompile Include="SelectProfileDialog.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="vcpkg.json" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
+    <ClInclude Include="BackgroundFrame.h" />
     <ClInclude Include="Definitions.h" />
+    <ClInclude Include="GameFrame.h" />
     <ClInclude Include="Profile.h" />
     <ClInclude Include="ProfileFrame.h" />
+    <ClInclude Include="SelectProfileDialog.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
