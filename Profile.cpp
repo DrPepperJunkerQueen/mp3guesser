@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include "Definitions.h"
+#include <stdio.h>
 
 Profile::Profile(const std::string& name)
 {
@@ -178,23 +179,45 @@ vector<Profile> Profile::readAllProfiles()
 
 void Profile::updateProfileStats()
 {
-	ofstream oFile(PROFILE_DATA_FILEPATH);
+	// 1. Najpierw wczytaj wszystko do pamiêci (tak jak chcia³eœ)
+	vector<Profile> profiles = Profile::readAllProfiles();
+
+	// 2. Przygotuj œcie¿ki
+	string originalFile = PROFILE_DATA_FILEPATH;
+	string tempFile = string(PROFILE_DATA_FILEPATH) + ".tmp";
+
+	// 3. Otwórz plik tymczasowy do zapisu
+	ofstream oFile(tempFile);
 	if (!oFile.is_open())
 	{
-		cerr << "Can't open profile data file." << endl;
+		cerr << "Can't open temp profile data file." << endl;
 		return;
 	}
-	vector<Profile> profiles = Profile::readAllProfiles();
+
+	// 4. PrzejdŸ przez profile w pamiêci i zapisz je do pliku .tmp
 	for (const Profile& profile : profiles)
 	{
 		if (profile.getID() == _id)
 		{
+			// To jest nasz profil! Zapisz zaktualizowane dane "this"
 			oFile << _id << ";" << _name << ";" << _highScore << ";" << _totalPoints << endl;
 		}
 		else
 		{
+			// To jest inny profil, przepisz go bez zmian
 			oFile << profile.getID() << ";" << profile.getName() << ";" << profile.getHighscore() << ";" << profile.getTotalPoints() << endl;
 		}
 	}
 	oFile.close();
+
+	// 5. Zamieñ stary plik na nowy
+	if (remove(originalFile.c_str()) != 0)
+	{
+		cerr << "Error deleting old profile file." << endl;
+	}
+
+	if (rename(tempFile.c_str(), originalFile.c_str()) != 0)
+	{
+		cerr << "Error renaming temp profile file." << endl;
+	}
 }

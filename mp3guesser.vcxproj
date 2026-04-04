@@ -137,9 +137,12 @@
     <ClCompile Include="App.cpp" />
     <ClCompile Include="BackgroundFrame.cpp" />
     <ClCompile Include="GameFrame.cpp" />
+    <ClCompile Include="ModeSelectFrame.cpp" />
+    <ClCompile Include="PlaySessionFrame.cpp" />
     <ClCompile Include="Profile.cpp" />
     <ClCompile Include="ProfileFrame.cpp" />
     <ClCompile Include="SelectProfileDialog.cpp" />
+    <ClCompile Include="SongLibrary.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="vcpkg.json" />
@@ -149,9 +152,13 @@
     <ClInclude Include="BackgroundFrame.h" />
     <ClInclude Include="Definitions.h" />
     <ClInclude Include="GameFrame.h" />
+    <ClInclude Include="ModeSelectFrame.h" />
+    <ClInclude Include="PlaySessionFrame.h" />
     <ClInclude Include="Profile.h" />
     <ClInclude Include="ProfileFrame.h" />
     <ClInclude Include="SelectProfileDialog.h" />
+    <ClInclude Include="Song.h" />
+    <ClInclude Include="SongLibrary.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

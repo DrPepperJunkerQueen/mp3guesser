@@ -5,52 +5,72 @@
 #include <wx/textdlg.h>
 #include <wx/msgdlg.h>
 #include <iostream>
+#include "Definitions.h"
+#include <wx/busyinfo.h> // Do okna ³adowania
 
-// ... (enum z ID przycisków - bez zmian) ...
 enum
 {
     ID_CreateProfileBtn = wxID_HIGHEST + 1,
-    ID_SelectProfileBtn
+    ID_SelectProfileBtn,
+    ID_RescanBtn // <-- NOWE ID
 };
 
-// Z Event Table ZNIKA EVT_PAINT
-wxBEGIN_EVENT_TABLE(ProfileFrame, BackgroundFrame) // <-- ZMIANA TUTAJ
+wxBEGIN_EVENT_TABLE(ProfileFrame, BackgroundFrame)
 EVT_BUTTON(ID_CreateProfileBtn, ProfileFrame::OnCreateProfile)
 EVT_BUTTON(ID_SelectProfileBtn, ProfileFrame::OnSelectProfile)
+EVT_BUTTON(ID_RescanBtn, ProfileFrame::OnRescanLibrary) // <-- NOWE POWI¥ZANIE
 wxEND_EVENT_TABLE()
 
-// Konstruktor jest teraz malutki
-ProfileFrame::ProfileFrame()
-    : BackgroundFrame(NULL, wxID_ANY, "MP3 Guesser - Profile Selection"), // <-- ZMIANA TUTAJ
-    m_selectedProfile(Profile()) // U¿yj konstruktora domyœlnego
+// Zmieñ konstruktor
+ProfileFrame::ProfileFrame(SongLibrary& songLib)
+    : BackgroundFrame(NULL, wxID_ANY, "MP3 Guesser - Profile Selection"),
+    m_selectedProfile(Profile()),
+    m_songLibRef(songLib) // <-- Zainicjuj referencjê
 {
-    // ZNIKN¥£ CA£Y KOD T£A I PANELU!
-    // Ju¿ jest w BackgroundFrame.
-    // m_panel jest teraz chronion¹ zmienn¹ odziedziczon¹ z rodzica.
-
     wxButton* createBtn = new wxButton(m_panel, ID_CreateProfileBtn, "Create Profile");
     wxButton* selectBtn = new wxButton(m_panel, ID_SelectProfileBtn, "Select Profile");
+    wxButton* rescanBtn = new wxButton(m_panel, ID_RescanBtn, "Rescan Library"); // <-- NOWY PRZYCISK
 
     wxSize buttonSize = wxSize(250, 60);
     createBtn->SetMinSize(buttonSize);
     selectBtn->SetMinSize(buttonSize);
+    rescanBtn->SetMinSize(buttonSize); // <-- Ustaw rozmiar
 
     wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
     sizer->AddStretchSpacer(1);
     sizer->Add(createBtn, 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 10);
     sizer->Add(selectBtn, 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 10);
+    sizer->Add(rescanBtn, 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 10); // <-- Dodaj do sizera
     sizer->AddStretchSpacer(1);
 
     m_panel->SetSizer(sizer);
-    // Ustawienia rozmiaru i centrowania s¹ ju¿ w klasie bazowej\
-
     m_panel->Layout();
 }
 
-// ZNIKNÊ£A funkcja OnPaint! Jest w klasie bazowej.
+// --- DODAJ NOW¥ FUNKCJÊ ---
+void ProfileFrame::OnRescanLibrary(wxCommandEvent& event)
+{
+    // Zapytaj u¿ytkownika, czy jest pewien
+    if (wxMessageBox("Rescanning the library may take several minutes. Are you sure?",
+        "Confirm Rescan",
+        wxYES_NO | wxICON_QUESTION, this) == wxNO)
+    {
+        return; // U¿ytkownik anulowa³
+    }
 
-// ... (Funkcje OnCreateProfile i OnSelectProfile - bez zmian) ...
-// (Pamiêtaj, ¿eby dodaæ #include "SelectProfileDialog.h" i "GameFrame.h")
+    { // Blok dla wxBusyInfo
+        wxBusyInfo info("Re-scanning music library, please wait...");
+        wxYield();
+
+        // U¿yj referencji, aby wywo³aæ skanowanie
+        m_songLibRef.ScanAndSave(MUSIC_LIBRARY_FOLDER);
+    }
+
+    wxMessageBox("Library rescan complete! Found " +
+        std::to_string(m_songLibRef.GetSongCount()) + " songs.",
+        "Success", wxOK | wxICON_INFORMATION, this);
+}
+
 void ProfileFrame::OnCreateProfile(wxCommandEvent& event)
 {
     wxTextEntryDialog dialog(this, "Enter your profile name:", "Create Profile");
@@ -65,8 +85,7 @@ void ProfileFrame::OnCreateProfile(wxCommandEvent& event)
         Profile newProfile(name);
         newProfile.createProfile();
 
-        // PrzejdŸ od razu do gry
-        GameFrame* game = new GameFrame(newProfile);
+        GameFrame* game = new GameFrame(newProfile, m_songLibRef); // <-- Przeka¿ referencjê
         game->Show();
         this->Close();
     }
@@ -80,7 +99,8 @@ void ProfileFrame::OnSelectProfile(wxCommandEvent& event)
         Profile chosenProfile = dialog.getSelectedProfile();
         if (chosenProfile.getID() != -1)
         {
-            GameFrame* game = new GameFrame(chosenProfile);
+            // ZMIANA TUTAJ: Musimy przekazaæ bibliotekê do GameFrame
+            GameFrame* game = new GameFrame(chosenProfile, m_songLibRef); // <-- Przeka¿ referencjê
             game->Show();
             this->Close();
         }

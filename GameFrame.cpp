@@ -1,30 +1,31 @@
 #include "GameFrame.h"
-#include "ProfileFrame.h"
+#include "ProfileFrame.h"    // Potrzebny do OnMainMenu
+#include "ModeSelectFrame.h" // Potrzebny do OnPlay
 #include <wx/msgdlg.h>
 
-// ... (enum z ID_PlayBtn - bez zmian) ...
 enum {
-        ID_PlayBtn = 1,
-        ID_MainMenuBtn
-     };
+    ID_PlayBtn = 1,
+    ID_MainMenuBtn
+};
 
-GameFrame::GameFrame(const Profile& userProfile)
+// ZMIANA: Zaktualizowany konstruktor i lista inicjalizacyjna
+GameFrame::GameFrame(const Profile& userProfile, SongLibrary& songLib)
     : BackgroundFrame(NULL, wxID_ANY, "MP3 Guesser - Let's Play!"),
-    m_userProfile(userProfile)
+    m_userProfile(userProfile),
+    m_songLibRef(songLib) // <-- ZAPISZ REFERENCJÊ
 {
     SetTitle("MP3 Guesser - Welcome, " + m_userProfile.getName() + "!");
 
-    // ZNIKN¥£ KOD TWORZENIA PANELU!
-    // U¿ywamy m_panel odziedziczonego z BackgroundFrame.
-
+    // Reszta konstruktora (tworzenie przycisków, sizer, layout)
+    // pozostaje BEZ ZMIAN
     wxButton* playBtn = new wxButton(m_panel, ID_PlayBtn, "Play");
-	wxButton* myProfileBtn = new wxButton(m_panel, wxID_ANY, "My Profile");
-	wxButton* mainMenuBtn = new wxButton(m_panel, ID_MainMenuBtn, "Main Menu");
+    wxButton* myProfileBtn = new wxButton(m_panel, wxID_ANY, "My Profile");
+    wxButton* mainMenuBtn = new wxButton(m_panel, ID_MainMenuBtn, "Main Menu");
 
     wxSize buttonSize = wxSize(250, 60);
     playBtn->SetMinSize(buttonSize);
-	myProfileBtn->SetMinSize(buttonSize);
-	mainMenuBtn->SetMinSize(buttonSize);
+    myProfileBtn->SetMinSize(buttonSize);
+    mainMenuBtn->SetMinSize(buttonSize);
 
     wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
     sizer->AddStretchSpacer(1);
@@ -34,7 +35,6 @@ GameFrame::GameFrame(const Profile& userProfile)
     sizer->AddStretchSpacer(1);
 
     m_panel->SetSizer(sizer);
-    // Ustawienia rozmiaru i centrowania s¹ ju¿ w klasie bazowej
 
     playBtn->Bind(wxEVT_BUTTON, &GameFrame::OnPlay, this);
     mainMenuBtn->Bind(wxEVT_BUTTON, &GameFrame::OnMainMenu, this);
@@ -42,18 +42,32 @@ GameFrame::GameFrame(const Profile& userProfile)
     m_panel->Layout();
 }
 
+// ZMIANA: Funkcja OnPlay musi teraz przekazaæ DALEJ bibliotekê
 void GameFrame::OnPlay(wxCommandEvent& event)
 {
-    wxMessageBox("Here the game will start!", "TO DO", wxOK | wxICON_INFORMATION);
+    // SprawdŸ, czy biblioteka ma jakiekolwiek piosenki, ZANIM przejdziesz dalej
+    if (m_songLibRef.GetSongCount() == 0)
+    {
+        wxMessageBox(
+            "Your song library is empty.\n\n"
+            "Please return to the main menu (Profile Selection) and use 'Rescan Library'.",
+            "No Songs to Play",
+            wxOK | wxICON_WARNING
+        );
+        return; // ZATRZYMAJ - nie otwieraj okna wyboru trybu
+    }
+
+    // Przeka¿ profil ORAZ bibliotekê piosenek
+    ModeSelectFrame* modeSelect = new ModeSelectFrame(m_userProfile, m_songLibRef);
+    modeSelect->Show();
+    this->Close();
 }
 
+// ZMIANA: Funkcja OnMainMenu te¿ musi przekazaæ bibliotekê
 void GameFrame::OnMainMenu(wxCommandEvent& event)
 {
-    ProfileFrame* menu = new ProfileFrame();
-
-    // 2. Poka¿ je
+    // Konstruktor ProfileFrame teraz te¿ wymaga biblioteki
+    ProfileFrame* menu = new ProfileFrame(m_songLibRef);
     menu->Show();
-
-    // 3. Zamknij (zniszcz) obecne okno (GameFrame)
     this->Close();
 }
