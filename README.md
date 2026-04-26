@@ -27,7 +27,7 @@ Projekt korzysta z `vcpkg` w trybie manifestu, co oznacza, że wszystkie zależn
 
 ### Wymagania:
 - Windows 10/11
-- Visual Studio 2022 (z zainstalowanym obciążeniem "Programowanie aplikacji klasycznych w języku C++")
+- Visual Studio 2022/2026 (z zainstalowanym obciążeniem "Programowanie aplikacji klasycznych w języku C++")
 - Zainstalowany `vcpkg`
 
 ### Kroki:
@@ -37,7 +37,7 @@ Projekt korzysta z `vcpkg` w trybie manifestu, co oznacza, że wszystkie zależn
    cd mp3guesser
    ```
 2. Upewnij się, że plik `vcpkg.json` znajduje się w głównym folderze projektu.
-3. Otwórz plik `mp3guesser.sln` w Visual Studio 2022.
+3. Otwórz plik `mp3guesser.sln` w Visual Studio.
 4. Visual Studio powinno automatycznie wykryć plik manifestu i rozpocząć pobieranie bibliotek (może to potrwać kilka-kilkanaście minut przy pierwszym uruchomieniu).
 5. Upewnij się, że w ustawieniach projektu wybrany jest standard **C++17** lub **C++20** oraz podsystem **Windows (/SUBSYSTEM:WINDOWS)**.
 6. Skompiluj projekt (F7) i uruchom go.
