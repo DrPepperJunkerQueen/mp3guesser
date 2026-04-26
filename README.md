@@ -1,54 +1,54 @@
 # mp3guesser
 
-Gra muzyczna typu "zgadnij melodię", stworzona w C++ przy użyciu nowoczesnych bibliotek multimedialnych i interfejsu graficznego.
+A music guessing game ("Name That Tune" style) built in C++ using modern multimedia libraries and a graphical user interface.
 
-## 🎵 O projekcie
+## 🎵 About the Project
 
-**mp3guesser** to aplikacja desktopowa, która pozwala użytkownikom testować swoją znajomość biblioteki muzycznej. Program odtwarza fragmenty utworów MP3, a zadaniem gracza jest poprawne odgadnięcie tytułu lub wykonawcy.
+**mp3guesser** is a desktop application that allows users to test their music library knowledge. The program plays snippets of MP3 tracks, and the player's goal is to correctly guess the title or the artist.
 
-### Główne cechy:
-- **System profili:** Tworzenie i wybór profilu użytkownika.
-- **Statystyki:** Śledzenie najwyższego wyniku (highscore) oraz sumy zdobytych punktów.
-- **Obsługa metadanych:** Wykorzystanie TagLib do poprawnego odczytu informacji o utworach.
-- **Wysokiej jakości dźwięk:** Silnik audio oparty na bibliotece SFML.
-- **Natywny interfejs:** GUI zbudowane za pomocą wxWidgets.
+### Key Features:
+- **Profile System:** Create and select user profiles.
+- **Statistics:** Track high scores and total points earned.
+- **Metadata Support:** Uses TagLib for accurate reading of track information.
+- **High-Quality Sound:** Audio engine based on the SFML library.
+- **Native Interface:** GUI built with wxWidgets.
 
-## 🛠️ Technologie
+## 🛠️ Technologies
 
-- **Język:** C++17 (lub nowszy)
+- **Language:** C++17 (or newer)
 - **GUI:** [wxWidgets](https://www.wxwidgets.org/)
 - **Audio:** [SFML](https://www.sfml-dev.org/)
-- **Tagi:** [TagLib](https://taglib.org/)
-- **Zarządzanie pakietami:** [vcpkg](https://vcpkg.io/) (tryb manifestu)
+- **Metadata:** [TagLib](https://taglib.org/)
+- **Package Management:** [vcpkg](https://vcpkg.io/) (Manifest Mode)
 
-## 🚀 Instalacja i kompilacja
+## 🚀 Installation and Compilation
 
-Projekt korzysta z `vcpkg` w trybie manifestu, co oznacza, że wszystkie zależności są pobierane i kompilowane automatycznie przy pierwszym otwarciu w Visual Studio.
+This project uses `vcpkg` in manifest mode, which means all dependencies are automatically downloaded and compiled when the project is first opened in Visual Studio.
 
-### Wymagania:
+### Requirements:
 - Windows 10/11
-- Visual Studio 2022/2026 (z zainstalowanym obciążeniem "Programowanie aplikacji klasycznych w języku C++")
-- Zainstalowany `vcpkg`
+- Visual Studio 2022/2026 (with "Desktop development with C++" workload installed)
+- `vcpkg` installed on your system
 
-### Kroki:
-1. Sklonuj repozytorium:
+### Steps:
+1. Clone the repository:
    ```bash
-   git clone [https://github.com/twoj-uzytkownik/mp3guesser.git](https://github.com/twoj-uzytkownik/mp3guesser.git)
+   git clone [https://github.com/DrPepperJunkerQueen/mp3guesser.git](https://github.com/DrPepperJunkerQueen/mp3guesser.git)
    cd mp3guesser
    ```
-2. Upewnij się, że plik `vcpkg.json` znajduje się w głównym folderze projektu.
-3. Otwórz plik `mp3guesser.sln` w Visual Studio.
-4. Visual Studio powinno automatycznie wykryć plik manifestu i rozpocząć pobieranie bibliotek (może to potrwać kilka-kilkanaście minut przy pierwszym uruchomieniu).
-5. Upewnij się, że w ustawieniach projektu wybrany jest standard **C++17** lub **C++20** oraz podsystem **Windows (/SUBSYSTEM:WINDOWS)**.
-6. Skompiluj projekt (F7) i uruchom go.
+2. Ensure the `vcpkg.json` file is in the project's root directory.
+3. Open the `mp3guesser.sln` file in Visual Studio.
+4. Visual Studio should automatically detect the manifest file and begin downloading libraries (this may take several minutes during the first run).
+5. Ensure the project settings are set to **C++17** or **C++20** standard and the SubSystem is set to **Windows (/SUBSYSTEM:WINDOWS)**.
+6. Build the project (F7) and run it.
 
-## 📁 Struktura plików
+## 📁 File Structure
 
-- `App.h / App.cpp`: Punkt wejścia aplikacji i inicjalizacja wxWidgets.
-- `ProfileFrame.h / ProfileFrame.cpp`: Główne okno wyboru i tworzenia profilu.
-- `Profile.h / Profile.cpp`: Logika zarządzania danymi użytkownika (wyniki, nazwa).
-- `vcpkg.json`: Lista zależności projektu.
+- `App.h / App.cpp`: Application entry point and wxWidgets initialization.
+- `ProfileFrame.h / ProfileFrame.cpp`: Main window for profile selection and creation.
+- `Profile.h / Profile.cpp`: Logic for managing user data (scores, name).
+- `vcpkg.json`: Project dependency list.
 
-## 📝 Licencja
+## 📝 License
 
-Projekt stworzony w celach edukacyjnych.
+This project was created for educational purposes.
